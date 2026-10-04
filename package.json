@@ -1,0 +1,15 @@
+{
+  "name": "devault",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generate and serve a Minecraft asset library (icons, textures, sounds) from an open mirror.",
+  "scripts": {
+    "build": "node tools/build-assets.mjs",
+    "build:sounds": "node tools/build-sounds.mjs",
+    "serve": "node tools/server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

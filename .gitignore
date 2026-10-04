@@ -1,0 +1,8 @@
+# generated asset output
+/out/
+
+# deps
+node_modules/
+
+# os
+.DS_Store
