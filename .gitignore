@@ -4,5 +4,9 @@
 # deps
 node_modules/
 
+# machine-local agent skill links (created by `devault skill install --project`)
+.opencode/
+.hermes/
+
 # os
 .DS_Store

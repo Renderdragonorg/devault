@@ -31,8 +31,7 @@ function parseArgs(argv) {
   return out;
 }
 
-const args = parseArgs(process.argv.slice(2));
-const ROOT = path.resolve(args.out);
+let ROOT = path.resolve(process.env.OUT || "out");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -221,7 +220,11 @@ async function serveFile(req, res, version, rel) {
 
 // ------------------------------------------------------------ router
 
-const server = http.createServer(async (req, res) => {
+export function startServer(argv = process.argv.slice(2)) {
+  const args = parseArgs(argv);
+  ROOT = path.resolve(args.out);
+
+  const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") {
     cors(res);
     res.writeHead(204);
@@ -345,7 +348,14 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(args.port, args.host, () => {
-  console.log(`devault API on http://localhost:${args.port}  (serving ${ROOT})`);
-  console.log(`open API, CORS * — try http://localhost:${args.port}/api`);
-});
+  server.listen(args.port, args.host, () => {
+    console.log(`devault API on http://localhost:${args.port}  (serving ${ROOT})`);
+    console.log(`open API, CORS * — try http://localhost:${args.port}/api`);
+  });
+
+  return server;
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  startServer();
+}

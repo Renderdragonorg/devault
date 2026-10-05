@@ -127,8 +127,8 @@ function pickVariant(blockstate) {
 
 // ---------------------------------------------------------------- main
 
-async function main() {
-  const args = parseArgs(process.argv.slice(2));
+export async function buildAssets(argv = process.argv.slice(2)) {
+  const args = parseArgs(argv);
   const version = args.version || (await latestRelease());
   const root = path.join(args.out, version);
   console.log(`building Minecraft ${version} -> ${root}`);
@@ -285,7 +285,7 @@ async function main() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main().catch((err) => {
+  buildAssets().catch((err) => {
     console.error(err);
     process.exit(1);
   });

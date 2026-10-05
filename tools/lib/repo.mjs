@@ -48,15 +48,20 @@ export function cmpVersion(a, b) {
   return 0;
 }
 
-/** Highest release branch on the mirror (skips snapshots/pre-releases). */
-export async function latestRelease() {
+/** All release branches on the mirror, ascending (snapshots/pre-releases excluded). */
+export async function listReleases() {
   const names = [];
   for (let page = 1; ; page++) {
     const res = await fetchJson(`${API}/repos/${REPO}/branches?per_page=100&page=${page}`);
     names.push(...res.map((b) => b.name));
     if (res.length < 100) break;
   }
-  const releases = names.filter((n) => /^\d+(\.\d+)+$/.test(n)).sort(cmpVersion);
+  return names.filter((n) => /^\d+(\.\d+)+$/.test(n)).sort(cmpVersion);
+}
+
+/** Highest release branch on the mirror. */
+export async function latestRelease() {
+  const releases = await listReleases();
   if (!releases.length) throw new Error("no release branches found");
   return releases[releases.length - 1];
 }

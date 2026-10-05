@@ -4,10 +4,23 @@
   "private": true,
   "type": "module",
   "description": "Generate and serve a Minecraft asset library (icons, textures, sounds) from an open mirror.",
+  "bin": {
+    "devault": "bin/devault.mjs"
+  },
+  "files": [
+    "bin",
+    "tools",
+    "web",
+    "skills",
+    "assets",
+    "README.md"
+  ],
   "scripts": {
-    "build": "node tools/build-assets.mjs",
-    "build:sounds": "node tools/build-sounds.mjs",
-    "serve": "node tools/server.mjs"
+    "devault": "node bin/devault.mjs",
+    "build": "node bin/devault.mjs build",
+    "build:assets": "node bin/devault.mjs assets",
+    "build:sounds": "node bin/devault.mjs sounds",
+    "serve": "node bin/devault.mjs serve"
   },
   "engines": {
     "node": ">=18"
