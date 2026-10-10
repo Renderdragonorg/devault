@@ -1,0 +1,54 @@
+name: Build Minecraft assets
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Force a specific Minecraft version (default: latest missing)"
+        required: false
+      all:
+        description: "Publish every mirror release that has no GitHub release yet"
+        type: boolean
+        default: false
+      channel:
+        description: "Release channel to track"
+        type: choice
+        options:
+          - release
+          - snapshot
+          - both
+        default: release
+
+permissions:
+  contents: write
+
+concurrency:
+  group: assets
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build and publish new releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_ALL: ${{ inputs.all }}
+          INPUT_CHANNEL: ${{ inputs.channel }}
+        run: |
+          args=(--repo "$GITHUB_REPOSITORY")
+          if [ -n "$INPUT_VERSION" ]; then args+=(--version "$INPUT_VERSION"); fi
+          if [ "$INPUT_ALL" = "true" ]; then args+=(--all); fi
+          if [ -n "$INPUT_CHANNEL" ]; then args+=(--channel "$INPUT_CHANNEL"); fi
+          node tools/publish.mjs "${args[@]}"

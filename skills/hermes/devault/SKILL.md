@@ -1,6 +1,6 @@
 ---
 name: devault
-description: "Build and serve Minecraft icons, textures and sounds."
+description: "Build, watch and serve Minecraft icons, textures and sounds."
 version: 1.0.0
 author: Coder-soft (Renderdragon)
 license: MIT
@@ -54,6 +54,8 @@ with `devault config set out ~/devault-assets`.
 | `build` | assets and sounds |
 | `assets` | textures, item icons, block icons |
 | `sounds` | every sound + `sounds.json` |
+| `watch` | track official versions, build new ones (`--channel release\|snapshot\|both`, `--source mojang\|mirror`, `--interval <sec>`, `--all`, `--dry-run`) |
+| `publish` | build new versions, attach archives to GitHub Releases (`--repo owner/name`, `--channel`, `--all`, `--dry-run`; needs `gh`; snapshots -> pre-release) |
 | `serve` | open CORS API + docs page |
 | `versions` | Minecraft versions on the mirror |
 | `info` | what is built in the output folder |

@@ -20,6 +20,8 @@
     "build": "node bin/devault.mjs build",
     "build:assets": "node bin/devault.mjs assets",
     "build:sounds": "node bin/devault.mjs sounds",
+    "watch": "node bin/devault.mjs watch",
+    "publish": "node bin/devault.mjs publish",
     "serve": "node bin/devault.mjs serve"
   },
   "engines": {

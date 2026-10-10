@@ -5,7 +5,7 @@ import path from "node:path";
 export const CONFIG_DIR = path.join(os.homedir(), ".config", "devault");
 export const CONFIG_PATH = path.join(CONFIG_DIR, "config.json");
 
-export const KNOWN_KEYS = ["out", "version", "size", "thumb", "port", "host", "concurrency"];
+export const KNOWN_KEYS = ["out", "version", "channel", "size", "thumb", "port", "host", "concurrency"];
 
 export async function loadConfig() {
   try {

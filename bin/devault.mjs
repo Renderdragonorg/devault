@@ -8,7 +8,9 @@ import { mkdir, rm, readFile, readdir, lstat, symlink, writeFile } from "node:fs
 import { buildAssets } from "../tools/build-assets.mjs";
 import { buildSounds } from "../tools/build-sounds.mjs";
 import { startServer } from "../tools/server.mjs";
-import { listReleases } from "../tools/lib/repo.mjs";
+import { watchReleases } from "../tools/watch.mjs";
+import { publishReleases } from "../tools/publish.mjs";
+import { listReleases, listChannelVersions } from "../tools/lib/repo.mjs";
 import { loadConfig, saveConfig, resolveOut, CONFIG_PATH, KNOWN_KEYS } from "../tools/lib/config.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -40,6 +42,8 @@ commands
   build              build assets and sounds
   assets             build textures, item icons and isometric block icons
   sounds             download every sound effect
+  watch              track official releases and build new ones automatically
+  publish            build new releases and attach the archives to GitHub Releases
   serve              run the open CORS API and the web page
   versions           list Minecraft versions available on the mirror
   info               show what is built in the output folder
@@ -50,6 +54,7 @@ commands
 common options
   --out <dir>        output folder      (flag > $DEVAULT_OUT > config > ./out)
   --version <v>      Minecraft version  (default: latest release)
+  --channel <ch>     release | snapshot | both  (watch, publish, versions)
   -h, --help         show this help
   -V, --version      show the devault version
 
@@ -57,6 +62,8 @@ examples
   devault build --version 26.3
   devault assets --only blocks --limit 40
   devault sounds --out ~/devault-assets
+  devault watch --channel snapshot
+  devault publish --repo owner/name
   devault info
   devault serve --port 9000`;
 
@@ -66,10 +73,11 @@ const config = await loadConfig();
 const hasFlag = (args, name) =>
   args.includes(name) || args.some((a) => a.startsWith(`${name}=`));
 
-function forward(argv, { out, version } = {}) {
+function forward(argv, { out, version, channel } = {}) {
   const args = [...argv];
   if (out && !hasFlag(args, "--out")) args.push("--out", out);
   if (version && !hasFlag(args, "--version")) args.push("--version", version);
+  if (channel && !hasFlag(args, "--channel")) args.push("--channel", channel);
   return args;
 }
 
@@ -211,6 +219,7 @@ async function main() {
     config
   );
   const version = config.version;
+  const channel = config.channel;
 
   switch (command) {
     case "build":
@@ -221,12 +230,17 @@ async function main() {
       return buildAssets(forward(rest, { out, version }));
     case "sounds":
       return buildSounds(forward(rest, { out, version }));
+    case "watch":
+      return watchReleases(forward(rest, { out, channel }));
+    case "publish":
+      return publishReleases(forward(rest, { out, channel }));
     case "serve":
       return startServer(forward(rest, { out }));
     case "versions": {
-      const releases = await listReleases();
+      const ch = rest.includes("--channel") ? rest[rest.indexOf("--channel") + 1] : channel || "release";
+      const list = ch === "release" ? await listReleases() : await listChannelVersions(ch);
       const n = rest.includes("--limit") ? Number(rest[rest.indexOf("--limit") + 1]) : 20;
-      console.log(releases.slice(-n).join("\n"));
+      console.log(list.slice(-n).join("\n"));
       return;
     }
     case "info":
